@@ -1,0 +1,13 @@
+# Keep the developer harnesses out of the deployed site. They are dev-only
+# tooling, are not referenced by index.html, and add ~2.2 MB of screenshots.
+tests/
+__pycache__/
+*.py[cod]
+
+# Local Vercel state (already covered by .gitignore, repeated for CLI deploys)
+.vercel/
+
+README.md
+LICENSE
+.gitignore
+.gitattributes

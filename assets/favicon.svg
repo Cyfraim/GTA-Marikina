@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Marikina">
+  <rect width="48" height="48" rx="9" fill="#0c1723"/>
+  <path d="M9 32V16l15 10.5L39 16v16" fill="none" stroke="#e8c37a" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M9 37h30" fill="none" stroke="#e8c37a" stroke-width="2.6" stroke-linecap="round" opacity=".55"/>
+</svg>

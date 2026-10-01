@@ -1,0 +1,13 @@
+# Normalize text files to LF in the repository; keep them as-is in the
+# working tree so Windows checkouts do not show spurious diffs.
+* text=auto eol=lf
+
+*.js   text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.svg  text eol=lf
+
+# Generated test artifacts
+tests/*.png binary

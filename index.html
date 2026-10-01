@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1723">
+  <meta name="description" content="Explore a living 3D open-world sandbox built from real OpenStreetMap data for Marikina City, Metro Manila.">
+  <title>Marikina — The City Is Yours</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/favicon.svg">
+  <meta property="og:title" content="Marikina — The City Is Yours">
+  <meta property="og:description" content="A low-poly 3D open-world sandbox built from real OpenStreetMap data for Marikina City, Metro Manila.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Geography data (c) OpenStreetMap contributors, ODbL 1.0.
+       https://www.openstreetmap.org/copyright -->
+</head>
+<body>
+  <canvas id="gameCanvas" tabindex="0" aria-label="Marikina 3D game. Use WASD to move. Escape opens settings."></canvas>
+  <div id="vignette" aria-hidden="true"></div>
+
+  <section id="loading" class="loading-screen" aria-label="Loading Marikina">
+    <div class="loading-top"><span class="wordmark">MARIKINA<span class="brand-dot">.</span></span><span class="eyebrow">METRO MANILA · PHILIPPINES</span></div>
+    <div class="loading-center">
+      <span class="eyebrow gold">A CITY BUILT WITH SOLE</span>
+      <canvas id="loadingShoe" width="640" height="300" aria-label="Illustrated Marikina shoe"></canvas>
+      <h1>Good things take a few steps.</h1>
+      <p id="loadingStatus" role="status">Getting the city ready…</p>
+      <div class="loading-track"><div id="loadingProgress"></div></div>
+      <p id="loadingError" class="loading-error hidden" role="alert"></p>
+      <button id="retryButton" class="retry-button hidden" type="button">RETRY DOWNLOAD</button>
+    </div>
+    <div class="loading-bottom"><span>THE SHOE CAPITAL OF THE PHILIPPINES</span><span>REAL MAP DATA / OPENSTREETMAP</span></div>
+  </section>
+
+  <main id="menu" class="menu-screen hidden">
+    <header class="menu-header">
+      <a class="brand-lockup" href="#" aria-label="Marikina home" onclick="return false">
+        <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M7 33V15l17 12 17-12v18M7 9l17 12L41 9" fill="none" stroke="currentColor" stroke-width="4"/><path d="M7 39h34" stroke="currentColor" stroke-width="3"/></svg>
+        <span class="wordmark">MARIKINA<span class="brand-dot">.</span><small>AN OPEN-WORLD EXPERIENCE</small></span>
+      </a>
+      <div class="header-location"><span class="status-dot"></span>14.6507° N &nbsp; 121.1029° E<span class="location-country">METRO MANILA, PH</span></div>
+    </header>
+    <section class="menu-hero">
+      <div class="chapter"><span class="chapter-line"></span> WELCOME TO THE NEIGHBORHOOD <span class="chapter-number">01 /</span></div>
+      <h1>THE CITY IS<br><em>YOURS.</em></h1>
+      <p class="hero-description">Every street has a story.<br>Take the wheel. Find yours in Marikina.</p>
+      <button id="startButton" class="primary-button" type="button">ENTER THE CITY</button>
+      <div class="start-note"><span class="status-dot"></span> FREE ROAM <span class="note-divider">/</span> NO DESTINATION REQUIRED</div>
+    </section>
+    <aside class="scene-caption" aria-label="City districts"><span class="scene-caption-rule"></span><span class="eyebrow">A LITTLE LOCAL PRIDE</span><strong>Made of streets.<br>Full of stories.</strong><div class="district-tags"><span>RIVERBANKS</span><span>BAYAN</span><span>CONCEPCION</span></div></aside>
+    <footer class="menu-footer">
+      <div class="menu-controls"><span class="controls-title">KNOW YOUR WAY</span><span><kbd>W A S D</kbd> Move</span><span><kbd>SHIFT</kbd> Sprint</span><span><kbd>E</kbd> Drive</span><span><kbd>RMB</kbd> Orbit</span><span><kbd>ESC</kbd> Pause & controls</span></div>
+      <div class="footer-bottom"><span>EXPLORE. DRIVE. MAKE YOUR OWN WAY.</span><span class="local-signoff">Tara na. <span>Let's go.</span> <span class="ph-colors" aria-hidden="true"><i></i><i></i><i></i></span></span></div>
+    </footer>
+  </main>
+
+  <section id="hud" class="hud hidden" aria-label="Game heads-up display">
+    <div class="player-card glass">
+      <div class="player-avatar" aria-hidden="true">J<span>01</span></div>
+      <div class="player-stats"><div class="player-name">JUAN <span id="playerStatus">LOCAL / ON FOOT</span></div><div class="vital-row"><span class="vital-icon health-icon">+</span><div class="vital-track"><i id="healthFill"></i></div><span id="healthValue">100</span></div><div class="vital-row armor"><span class="vital-icon">◇</span><div class="vital-track"><i id="armorFill"></i></div><span id="armorValue">50</span></div></div>
+    </div>
+    <div class="wanted-block"><div class="wanted-header"><span class="eyebrow">MKPD</span><span id="wantedStatus">KEEP IT QUIET</span><button id="settingsButton" class="settings-button" type="button" aria-label="Pause and settings" title="Pause · Esc">Ⅱ</button></div><div id="wantedShields" class="wanted-shields" aria-label="No wanted level"><span>★</span><span>★</span><span>★</span></div><div class="evade-track"><i id="evadeFill"></i></div></div>
+    <div id="worldLabels" class="world-labels" aria-hidden="true"></div>
+    <div id="crosshair" class="crosshair" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+    <div id="interactionPrompt" class="interaction-prompt hidden"><kbd>E</kbd><span id="interactionText">Enter vehicle</span></div>
+    <div id="notifications" class="notifications" aria-live="polite" aria-atomic="false"></div>
+    <div class="ammo-card"><div class="weapon-heading"><svg viewBox="0 0 64 34" aria-hidden="true"><path d="M4 5h47v5h9v6H31l-5 5 3 11H15l-5-16H4z" fill="currentColor"/><path d="M30 17h10v7H29" fill="none" stroke="currentColor" stroke-width="3"/></svg><span>9MM PISTOL<small id="weaponStatus">SEMI-AUTOMATIC</small></span></div><div class="ammo-count"><strong id="ammoValue">12</strong><span>/ <b id="reserveValue">48</b></span><kbd>R</kbd></div><div class="reload-track"><i id="reloadFill"></i></div><div class="ammo-hint">LMB FIRE <span>·</span> RMB ORBIT <span>·</span> C VIEW</div></div>
+    <div id="speedGauge" class="speed-gauge hidden"><span id="vehicleName" class="eyebrow">CITY SEDAN</span><div><span id="gearValue">D</span><strong id="speedValue">000</strong><span class="speed-unit">KM/H</span></div><div class="speed-track"><i id="speedFill"></i></div><span class="driving-hint">SPACE BRAKE <span>·</span> H HORN <span>·</span> E EXIT</span></div>
+    <div class="map-block"><div class="map-heading"><span id="districtName">MARIKINA</span><span id="worldClock">08:40</span></div><div class="map-frame"><canvas id="minimap" width="400" height="400" aria-label="Minimap: north is up, your position is the white arrow"></canvas><span class="map-north">N</span><span class="map-scale">20 M <i></i></span></div><div class="map-footer"><span class="status-dot"></span><span id="mapStatus">MARIKINA CITY</span><span id="dayStatus">DAYTIME</span></div></div>
+    <div id="deathOverlay" class="death-overlay hidden"><span class="eyebrow">THE CITY WILL WAIT</span><strong>WASTED.</strong><p>Taking you back to City Hall<span id="respawnTime"></span></p></div>
+    <div id="hitFlash" aria-hidden="true"></div>
+  </section>
+
+  <section id="pauseMenu" class="pause-screen hidden" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+    <div class="pause-panel">
+      <header class="pause-heading"><div><span class="eyebrow gold">TAKE A BREATHER</span><h1 id="pauseTitle">CITY ON HOLD<span>.</span></h1></div><span class="pause-badge"><i class="status-dot"></i> PAUSED</span></header>
+      <div class="pause-columns">
+        <section class="settings-column"><h2><span>01</span> MAKE IT YOURS</h2>
+          <div class="setting-row"><label for="shadowQuality">Shadow quality<small>Lighting & performance</small></label><select id="shadowQuality"><option value="off">Off</option><option value="low" selected>Low</option><option value="high">High</option></select></div>
+          <div class="setting-row range-row"><label for="fov">Field of view <output id="fovValue" for="fov">70</output></label><input id="fov" type="range" min="60" max="90" step="1" value="70"></div>
+          <div class="setting-row range-row"><label for="sensitivity">Camera sensitivity <output id="sensitivityValue" for="sensitivity">1</output></label><input id="sensitivity" type="range" min="0.2" max="3" step="0.1" value="1"></div>
+          <div class="setting-row range-row"><label for="volume">Master volume <output id="volumeValue" for="volume">0.45</output></label><input id="volume" type="range" min="0" max="1" step="0.05" value="0.45"></div>
+          <div class="setting-row range-row"><label for="drawDistance">Draw distance <output id="drawDistanceValue" for="drawDistance">220</output></label><input id="drawDistance" type="range" min="100" max="350" step="10" value="220"></div>
+          <p class="settings-note">Settings save automatically on this device.</p>
+        </section>
+        <section class="control-column"><h2><span>02</span> STREET SMARTS</h2><dl class="control-list"><div><dt>Move / drive</dt><dd><kbd>W A S D</kbd></dd></div><div><dt>Sprint / handbrake</dt><dd><kbd>SHIFT</kbd><span>/</span><kbd>SPACE</kbd></dd></div><div><dt>Aim / orbit camera</dt><dd><kbd>RMB + DRAG</kbd></dd></div><div><dt>Fire / reload</dt><dd><kbd>LMB</kbd><span>/</span><kbd>R</kbd></dd></div><div><dt>Enter / exit vehicle</dt><dd><kbd>E</kbd></dd></div><div><dt>Camera view / zoom</dt><dd><kbd>C</kbd><span>/</span><kbd>SCROLL</kbd></dd></div><div><dt>Horn</dt><dd><kbd>H</kbd></dd></div><div><dt>Pause / resume</dt><dd><kbd>ESC</kbd></dd></div></dl><p class="local-tip"><span>INGAT, JUAN.</span> Lose the police's line of sight and stay out of trouble for 15 seconds to clear your wanted level.</p></section>
+      </div>
+      <footer class="pause-actions"><button id="resumeButton" class="primary-button" type="button">BACK TO THE STREETS</button><button id="quitButton" class="text-button" type="button">RETURN TO TITLE <span>↗</span></button></footer>
+    </div>
+  </section>
+  <noscript><div class="no-script">Marikina needs JavaScript and WebGL. Enable JavaScript, then reload to explore the city.</div></noscript>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/maploader.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/vehicles.js"></script>
+  <script src="js/npcs.js"></script>
+  <script src="js/combat.js"></script>
+  <script src="js/police.js"></script>
+  <script src="js/hud.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
